@@ -37,3 +37,5 @@ Painel de controle focado em desktop/tablet para o caixa ou gerente.
     *   Adicione, edite e pause produtos (sold out) instantaneamente.
 4.  **Fábrica de QR Codes**:
     *   Gere e imprima as plaquinhas de todas as mesas.
+5.  **Monitoramento de Staff**:
+    *   Widget de **Staff Online** com status em tempo real.
