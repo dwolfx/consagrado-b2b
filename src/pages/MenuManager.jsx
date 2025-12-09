@@ -1,7 +1,18 @@
-import { products } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { Plus, Edit, Trash } from 'lucide-react';
 
 const MenuManager = () => {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await api.getProducts();
+            setProducts(data);
+        };
+        load();
+    }, []);
+
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>

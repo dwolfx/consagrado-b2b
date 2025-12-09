@@ -1,16 +1,39 @@
-# React + Vite
+# Chefia (B2B App) 💼
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Painel de gestão para gerentes e caixas de bares e restaurantes.
 
-Currently, two official plugins are available:
+## 🛠️ Tecnologias
+- **Frontend**: React (Vite)
+- **Backend/Database**: Supabase (PostgreSQL + Realtime)
+- **Estilização**: CSS Modules (Vanilla)
+- **Icons**: Lucide React
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Como Rodar
+```bash
+# Instalar dependências
+npm install
 
-## React Compiler
+# Rodar localmente
+npm run dev
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Build de produção
+npm run build
+```
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🖥️ Dashboard Operacional
+Painel de controle focado em desktop/tablet para o caixa ou gerente.
+*   **Acesso Seguro**: Login com credenciais de gerenciamento.
+
+## 🛠️ Funcionalidades
+1.  **Mapa de Mesas (Live View)**:
+    *   🟢 **Livres** | 🔴 **Ocupadas** | 🟡 **Chamando** (Alerta visual).
+    *   *Atualização em Tempo Real via Supabase.*
+2.  **Detalhe da Mesa**:
+    *   Lista completa de itens consumidos em tempo real.
+    *   Botão de **Encerrar/Receber** mesa.
+3.  **Gerenciador de Cardápio**:
+    *   Adicione, edite e pause produtos (sold out) instantaneamente.
+4.  **Fábrica de QR Codes**:
+    *   Gere e imprima as plaquinhas de todas as mesas.
