@@ -45,7 +45,7 @@ const Dashboard = () => {
     return (
         <div>
             {/* KPI Cards */}
-            <div className="stats-grid">
+            <div className="stats-grid" style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: 'fit-content' }}>
                 <div className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div>
