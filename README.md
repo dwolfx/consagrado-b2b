@@ -39,3 +39,6 @@ Painel de controle focado em desktop/tablet para o caixa ou gerente.
     *   Gere e imprima as plaquinhas de todas as mesas.
 5.  **Monitoramento de Staff**:
     *   Widget de **Staff Online** com status em tempo real.
+6.  **KDS (Kitchen Display System)**:
+    *   Tela de Cozinha para gerenciamento de pedidos (A Fazer, Preparando, Pronto).
+    *   Sincronização em tempo real entre salão e cozinha.
