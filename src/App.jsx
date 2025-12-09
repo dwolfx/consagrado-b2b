@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
@@ -17,7 +17,12 @@ const RequireAuth = ({ children }) => {
 const LayoutWrapper = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('chefia_user') || '{}');
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem('chefia_user') || '{}');
+  } catch (e) {
+    console.error('Error parsing user', e);
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('chefia_user');
