@@ -60,6 +60,32 @@ export const api = {
         return data;
     },
 
+    closeTable: async (tableId) => {
+        try {
+            // 1. Mark all pending orders as paid
+            const { error: orderError } = await supabase
+                .from('orders')
+                .update({ status: 'paid' })
+                .eq('table_id', tableId)
+                .in('status', ['pending', 'delivered', 'ready']); // Update active statuses
+
+            if (orderError) throw orderError;
+
+            // 2. Free the table
+            const { error: tableError } = await supabase
+                .from('tables')
+                .update({ status: 'free' })
+                .eq('id', tableId);
+
+            if (tableError) throw tableError;
+
+            return true;
+        } catch (error) {
+            console.error('Error closing table:', error);
+            return false;
+        }
+    },
+
     // Establishments
     getEstablishments: async () => {
         let { data, error } = await supabase

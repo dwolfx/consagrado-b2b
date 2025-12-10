@@ -45,7 +45,7 @@ const Dashboard = () => {
     return (
         <div>
             {/* KPI Cards */}
-            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                 <div className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div>
@@ -54,20 +54,6 @@ const Dashboard = () => {
                         </div>
                         <div style={{ backgroundColor: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', height: 'max-content' }}>
                             <Users size={24} color="var(--primary)" />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div>
-                            <p style={{ color: 'var(--text-secondary)' }}>Faturamento (Agora)</p>
-                            <h2 style={{ fontSize: '2rem', margin: '0.5rem 0' }}>
-                                {currentRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </h2>
-                        </div>
-                        <div style={{ backgroundColor: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', height: 'max-content' }}>
-                            <DollarSign size={24} color="var(--success)" />
                         </div>
                     </div>
                 </div>
