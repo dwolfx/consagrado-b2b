@@ -45,7 +45,7 @@ const Dashboard = () => {
     return (
         <div>
             {/* KPI Cards */}
-            <div className="stats-grid" style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: 'fit-content' }}>
+            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                 <div className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div>
@@ -127,9 +127,10 @@ const Dashboard = () => {
                 </div>
 
                 {/* Staff Online Widget */}
+                {/* Staff Online Widget */}
                 <div className="card" style={{ height: 'fit-content' }}>
-                    <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
+                    <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)', boxShadow: '0 0 8px var(--success)' }}></div>
                         Equipe Online
                     </h3>
                     {staff.length === 0 ? (
@@ -137,19 +138,25 @@ const Dashboard = () => {
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {staff.map(s => (
-                                <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: '1px solid var(--bg-tertiary)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                            {s.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <div style={{ fontWeight: '500', fontSize: '0.9rem' }}>{s.name}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{s.shift_description}</div>
+                                <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid var(--bg-tertiary)' }}>
+                                    <div>
+                                        <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: '0.25rem' }}>{s.name}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Clock size={12} />
+                                            {s.shift_description || 'Turno Padrão'}
                                         </div>
                                     </div>
+
                                     {s.phone && (
-                                        <a href={`tel:${s.phone}`} style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary)' }}>
-                                            <Phone size={16} />
+                                        <a href={`tel:${s.phone}`} style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            width: '36px', height: '36px',
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                            color: 'var(--primary)',
+                                            transition: '0.2s'
+                                        }}>
+                                            <Phone size={18} />
                                         </a>
                                     )}
                                 </div>
