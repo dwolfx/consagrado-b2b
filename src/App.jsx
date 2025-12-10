@@ -37,7 +37,6 @@ const LayoutWrapper = ({ children }) => {
   ];
 
   return (
-  return (
     <div className="dashboard-layout">
       {/* Sidebar */}
       <aside className="sidebar">
@@ -91,14 +90,13 @@ const LayoutWrapper = ({ children }) => {
             <LogOut size={18} /> Sair
           </button>
         </div>
-      </aside>
+      </aside >
 
       {/* Main Content */}
-      <main className="main-content">
+      < main className="main-content" >
         {children}
-      </main>
-    </div>
-  );
+      </main >
+    </div >
   );
 };
 
