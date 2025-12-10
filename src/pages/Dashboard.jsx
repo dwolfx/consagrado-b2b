@@ -89,7 +89,7 @@ const Dashboard = () => {
                 {/* Live Table Map */}
                 <div>
                     <h2 style={{ marginBottom: '1.5rem' }}>Mapa de Mesas</h2>
-                    <div className="table-grid">
+                    <div className="grid-tables">
                         {tables.map(table => (
                             <div
                                 key={table.id}

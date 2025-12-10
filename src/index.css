@@ -75,36 +75,44 @@ body {
 
 .grid-tables {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
 }
 
 .table-card {
-  aspect-ratio: 1;
+  background-color: var(--bg-secondary);
   border-radius: var(--radius);
+  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s;
   border: 2px solid transparent;
+  color: var(--text-primary);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .table-card:hover {
   transform: translateY(-4px);
+  filter: brightness(1.2);
 }
 
 .status-free {
-  background-color: rgba(34, 197, 94, 0.1);
   border-color: var(--success);
-  color: var(--success);
+  background-color: rgba(34, 197, 94, 0.15);
 }
 
 .status-occupied {
-  background-color: rgba(99, 102, 241, 0.1);
   border-color: var(--primary);
-  color: var(--primary);
+  background-color: rgba(99, 102, 241, 0.15);
+}
+
+.status-calling {
+  border-color: var(--warning);
+  background-color: rgba(234, 179, 8, 0.15);
+  animation: pulse 2s infinite;
 }
 
 .status-calling {
