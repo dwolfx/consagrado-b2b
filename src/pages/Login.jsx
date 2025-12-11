@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Lock } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
+import { api } from '../services/api';
 
 const ROLES = [
     { id: 'gerente', label: '👑 Gerente' },
@@ -14,24 +15,66 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('gerente');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        // Mock Login - In production, backend handles role based on auth
-        if (email && password) {
-            const userMock = {
-                email,
-                name: role.charAt(0).toUpperCase() + role.slice(1),
-                role
-            };
-            localStorage.setItem('chefia_user', JSON.stringify(userMock));
+        setError('');
+        setLoading(true);
 
-            // Redirect logic will be handled by the App wrapper or we can force it here
-            if (role === 'cozinha' || role === 'bar') {
-                navigate('/kitchen');
-            } else {
-                navigate('/');
+        try {
+            // --- DEMO BYPASS ---
+            if (email === 'demo@demo' && password === 'demo') {
+                const userSession = {
+                    id: '00000000-0000-0000-0000-000000000000',
+                    email: 'demo@demo',
+                    name: 'Demo Manager',
+                    role: role || 'gerente'
+                };
+                localStorage.setItem('chefia_user', JSON.stringify(userSession));
+                navigate(role === 'cozinha' ? '/kitchen' : '/');
+                return;
             }
+            if (email === 'garcom@demo.com' && password === '0000') {
+                const userSession = {
+                    id: '11111111-1111-1111-1111-111111111111',
+                    email: 'garcom@demo.com',
+                    name: 'Garçom Zé',
+                    role: 'recepcao'
+                };
+                localStorage.setItem('chefia_user', JSON.stringify(userSession));
+                navigate('/');
+                return;
+            }
+            // -------------------
+
+            // 1. Real Login via Supabase Auth
+            const { user } = await api.login(email, password);
+
+            if (user) {
+                // 2. Hydrate Session (Mocking Role for now, ideally fetch from public.users)
+                const userSession = {
+                    id: user.id,
+                    email: user.email,
+                    name: role === 'gerente' ? 'Gerente' : 'Staff', // Fallback name
+                    role: role // We trust the dropdown for this Demo/MVP phase
+                };
+
+                localStorage.setItem('chefia_user', JSON.stringify(userSession));
+
+                // 3. Redirect based on role
+                if (role === 'cozinha' || role === 'bar') {
+                    navigate('/kitchen');
+                } else {
+                    navigate('/');
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Falha ao entrar. Verifique email e senha.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -58,8 +101,14 @@ const Login = () => {
 
                 <form onSubmit={handleLogin} style={{ display: 'grid', gap: '1rem' }}>
 
+                    {error && (
+                        <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.2)', color: '#fca5a5', borderRadius: '8px', fontSize: '0.9rem', textAlign: 'center' }}>
+                            {error}
+                        </div>
+                    )}
+
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: '#cbd5e1' }}>Perfil de Acesso</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: '#cbd5e1' }}>Perfil de Acesso (Simulado)</label>
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
@@ -80,11 +129,12 @@ const Login = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="user@bar.com"
+                            placeholder="staff@bar.com"
                             style={{
                                 width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #475569',
                                 background: '#1e293b', color: 'white'
                             }}
+                            required
                         />
                     </div>
                     <div>
@@ -97,14 +147,19 @@ const Login = () => {
                                 width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #475569',
                                 background: '#1e293b', color: 'white'
                             }}
+                            required
                         />
                     </div>
-                    <button className="btn" style={{
-                        marginTop: '1rem', width: '100%', padding: '0.75rem', background: '#3b82f6',
-                        color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'
+                    <button disabled={loading} className="btn" style={{
+                        marginTop: '1rem', width: '100%', padding: '0.75rem', background: loading ? '#475569' : '#3b82f6',
+                        color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer'
                     }}>
-                        Entrar
+                        {loading ? 'Entrando...' : 'Entrar'}
                     </button>
+
+                    <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#64748b', marginTop: '1rem' }}>
+                        Dica: Use a mesma conta criada no App de Cliente
+                    </div>
                 </form>
             </div>
         </div>

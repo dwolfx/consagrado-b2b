@@ -123,14 +123,11 @@ export const api = {
 
     // Users (Auth)
     login: async (email, password) => {
-        // For this demo, we are doing simple table lookup. 
-        // In production, use supabase.auth.signInWithPassword()
-        let { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .eq('password', password)
-            .single();
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+        if (error) throw error;
         return data;
     }
 };

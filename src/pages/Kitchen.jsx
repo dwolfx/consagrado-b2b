@@ -20,6 +20,7 @@ const Kitchen = () => {
                     tables (number),
                     products (name, category)
                 `)
+                .gt('price', 0)
                 .in('status', ['pending', 'preparing', 'ready'])
                 .order('created_at', { ascending: true }); // Oldest first
 
