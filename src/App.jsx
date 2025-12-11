@@ -38,17 +38,39 @@ const LayoutWrapper = ({ children }) => {
     { label: 'QR Code', path: '/qr', icon: QrCode },
   ];
 
+  const userRole = user.role || 'gerente';
+
+  const PERMISSIONS = {
+    'gerente': '*',
+    'recepcao': ['/', '/table'], // Dashboard has the map (Entry/Exit control)
+    'cozinha': ['/kitchen'],
+    'bar': ['/kitchen']
+  };
+
+  const allowedPaths = PERMISSIONS[userRole] || [];
+
+  const filteredNavItems = navItems.filter(item => {
+    if (userRole === 'gerente') return true;
+    // Special logic: 'recepcao' needs access to '/' (Dashboard) but technically '/table' is dynamic, 
+    // so we filter sidebar items strictly by path
+    return allowedPaths.includes(item.path);
+  });
+
   return (
     <div className="dashboard-layout">
       {/* Sidebar */}
       <aside className="sidebar">
         <div style={{ padding: '2rem', borderBottom: '1px solid var(--bg-tertiary)' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>Chefia</h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Gestão de Bar</p>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+            {userRole === 'gerente' ? 'Gestão Completa' :
+              userRole === 'recepcao' ? 'Recepção' :
+                userRole === 'cozinha' ? 'Cozinha' : 'Bar'}
+          </p>
         </div>
 
         <nav style={{ flex: 1, padding: '1rem' }}>
-          {navItems.map(item => (
+          {filteredNavItems.map(item => (
             <NavLink
               key={item.path}
               to={item.path}
