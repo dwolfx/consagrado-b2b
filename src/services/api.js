@@ -8,12 +8,39 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export const api = {
     // Products
+    // Products
     getProducts: async () => {
         let { data, error } = await supabase
             .from('products')
-            .select('*');
+            .select('*')
+            .order('name');
         if (error) console.error('Error fetching products', error);
         return data || [];
+    },
+    createProduct: async (product) => {
+        const { data, error } = await supabase
+            .from('products')
+            .insert([product])
+            .select();
+        if (error) throw error;
+        return data[0];
+    },
+    updateProduct: async (id, updates) => {
+        const { data, error } = await supabase
+            .from('products')
+            .update(updates)
+            .eq('id', id)
+            .select();
+        if (error) throw error;
+        return data[0];
+    },
+    deleteProduct: async (id) => {
+        const { error } = await supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        return true;
     },
 
     // Tables

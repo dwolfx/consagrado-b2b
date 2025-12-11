@@ -1,21 +1,97 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Plus, Edit, Trash, Upload, Download, FileSpreadsheet, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, X, Save } from 'lucide-react';
 
 const MenuManager = () => {
     const [products, setProducts] = useState([]);
     const [activeTab, setActiveTab] = useState('list');
+
+    // Import State
     const [dragActive, setDragActive] = useState(false);
-    const [uploadStatus, setUploadStatus] = useState('idle'); // idle, uploading, success, error
+    const [uploadStatus, setUploadStatus] = useState('idle');
+
+    // CRUD State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        category: 'Lanches',
+        price: '',
+        description: '',
+        image_url: ''
+    });
+
+    const categories = ['Lanches', 'Bebidas', 'Porções', 'Sobremesas', 'Combos'];
 
     useEffect(() => {
-        const load = async () => {
-            const data = await api.getProducts();
-            setProducts(data);
-        };
-        load();
+        loadProducts();
     }, []);
 
+    const loadProducts = async () => {
+        const data = await api.getProducts();
+        setProducts(data);
+    };
+
+    // --- CRUD HANDLERS ---
+    const handleOpenModal = (product = null) => {
+        if (product) {
+            setEditingProduct(product);
+            setFormData({
+                name: product.name,
+                category: product.category,
+                price: product.price,
+                description: product.description || '',
+                image_url: product.image_url || ''
+            });
+        } else {
+            setEditingProduct(null);
+            setFormData({
+                name: '',
+                category: 'Lanches',
+                price: '',
+                description: '',
+                image_url: ''
+            });
+        }
+        setIsModalOpen(true);
+    };
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                ...formData,
+                price: parseFloat(formData.price)
+            };
+
+            if (editingProduct) {
+                await api.updateProduct(editingProduct.id, payload);
+            } else {
+                await api.createProduct(payload);
+            }
+
+            setIsModalOpen(false);
+            loadProducts();
+            // alert('Produto salvo com sucesso!');
+        } catch (error) {
+            console.error('Erro ao salvar produto:', error);
+            alert('Erro ao salvar. Verifique o console.');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (confirm('Tem certeza que deseja excluir este produto?')) {
+            try {
+                await api.deleteProduct(id);
+                loadProducts();
+            } catch (error) {
+                console.error('Erro ao excluir:', error);
+                alert('Erro ao excluir produto.');
+            }
+        }
+    };
+
+    // --- IMPORT HANDLERS ---
     const handleDrag = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -37,10 +113,8 @@ const MenuManager = () => {
 
     const handleFile = (file) => {
         setUploadStatus('uploading');
-        // Simulate upload delay
         setTimeout(() => {
             setUploadStatus('success');
-            alert(`Arquivo "${file.name}" processado com sucesso! 50 produtos identificados.`);
         }, 1500);
     };
 
@@ -55,7 +129,7 @@ const MenuManager = () => {
     };
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>
             <div className="header" style={{ marginBottom: '2rem' }}>
                 <div>
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Cardápio Digital</h1>
@@ -91,9 +165,13 @@ const MenuManager = () => {
             </div>
 
             {activeTab === 'list' && (
-                <div>
+                <div className="animate-fade-in">
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                            onClick={() => handleOpenModal()}
+                            className="btn btn-primary"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        >
                             <Plus size={20} /> Novo Produto
                         </button>
                     </div>
@@ -105,35 +183,58 @@ const MenuManager = () => {
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Produto</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Categoria</th>
                                     <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Preço</th>
-                                    <th style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Ações</th>
+                                    <th style={{ padding: '1rem', color: 'var(--text-secondary)', textAlign: 'right' }}>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map(product => (
-                                    <tr key={product.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                        <td style={{ padding: '1rem', fontWeight: 500 }}>{product.name}</td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <span style={{
-                                                backgroundColor: 'var(--bg-secondary)', padding: '4px 10px',
-                                                borderRadius: '99px', fontSize: '0.75rem', fontWeight: '600',
-                                                border: '1px solid var(--border)', color: 'var(--text-secondary)'
-                                            }}>
-                                                {product.category}
-                                            </span>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                        </td>
-                                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn" style={{ padding: '0.5rem', backgroundColor: 'var(--bg-secondary)' }}>
-                                                <Edit size={16} color="var(--text-secondary)" />
-                                            </button>
-                                            <button className="btn" style={{ padding: '0.5rem', backgroundColor: '#fef2f2' }}>
-                                                <Trash size={16} color="var(--danger)" />
-                                            </button>
+                                {products.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            Nenhum produto cadastrado.
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    products.map(product => (
+                                        <tr key={product.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                            <td style={{ padding: '1rem', fontWeight: 500 }}>
+                                                <div>{product.name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {product.description}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <span style={{
+                                                    backgroundColor: 'var(--bg-secondary)', padding: '4px 10px',
+                                                    borderRadius: '99px', fontSize: '0.75rem', fontWeight: '600',
+                                                    border: '1px solid var(--border)', color: 'var(--text-secondary)'
+                                                }}>
+                                                    {product.category}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                {Number(product.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </td>
+                                            <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => handleOpenModal(product)}
+                                                        className="btn"
+                                                        style={{ padding: '0.5rem', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+                                                    >
+                                                        <Edit size={16} color="var(--text-secondary)" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(product.id)}
+                                                        className="btn"
+                                                        style={{ padding: '0.5rem', backgroundColor: '#fef2f2', border: '1px solid #fee2e2' }}
+                                                    >
+                                                        <Trash size={16} color="var(--danger)" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -209,6 +310,96 @@ const MenuManager = () => {
                                 )}
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* PRODUCT MODAL */}
+            {isModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 100, backdropFilter: 'blur(4px)'
+                }}>
+                    <div className="card" style={{ width: '100%', maxWidth: '500px', backgroundColor: 'white', border: 'none', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+                            <h2 style={{ fontSize: '1.25rem', margin: 0 }}>
+                                {editingProduct ? 'Editar Produto' : 'Novo Produto'}
+                            </h2>
+                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
+                                <X size={20} color="var(--text-secondary)" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSave}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Nome do Produto</label>
+                                <input
+                                    className="input-field"
+                                    required
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Ex: X-Bacon"
+                                />
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Categoria</label>
+                                    <select
+                                        className="input-field"
+                                        value={formData.category}
+                                        onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                    >
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Preço (R$)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        className="input-field"
+                                        required
+                                        value={formData.price}
+                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Descrição</label>
+                                <textarea
+                                    className="input-field"
+                                    rows="3"
+                                    value={formData.description}
+                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Ingredientes e detalhes..."
+                                    style={{ resize: 'none' }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="btn"
+                                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    style={{ width: 'auto', paddingLeft: '2rem', paddingRight: '2rem' }}
+                                >
+                                    <Save size={18} /> Salvar
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
