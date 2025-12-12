@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
