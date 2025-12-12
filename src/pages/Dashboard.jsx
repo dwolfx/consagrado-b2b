@@ -2,11 +2,21 @@ import { useState, useEffect } from 'react';
 import { api, supabase } from '../services/api';
 import { Users, DollarSign, Bell, Clock, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import WaiterDashboard from './WaiterDashboard';
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const [tables, setTables] = useState([]);
     const [staff, setStaff] = useState([]);
+
+    // --- WAITER CHECK ---
+    const user = JSON.parse(localStorage.getItem('chefia_user') || '{}');
+    const role = user.role || 'gerente';
+
+    if (role === 'recepcao' || role === 'garcom') {
+        return <WaiterDashboard />;
+    }
+    // --------------------
 
     useEffect(() => {
         // Initial Load
@@ -37,10 +47,6 @@ const Dashboard = () => {
     // Derived stats
     const occupiedTables = tables.filter(t => t.status === 'occupied').length;
     const calls = tables.filter(t => t.callWaiter).length;
-    const currentRevenue = tables.reduce((acc, t) => {
-        const tableTotal = t.orders?.reduce((sum, o) => sum + o.price, 0) || 0;
-        return acc + tableTotal;
-    }, 0);
 
     return (
         <div>
@@ -112,7 +118,6 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Staff Online Widget */}
                 {/* Staff Online Widget */}
                 <div className="card" style={{ height: 'fit-content' }}>
                     <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
