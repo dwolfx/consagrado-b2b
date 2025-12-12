@@ -1,4 +1,3 @@
-```javascript
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard } from 'lucide-react';
@@ -13,7 +12,7 @@ const ROLES = [
 
 const Login = () => {
     const navigate = useNavigate();
-    
+
     // Manager State
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -30,20 +29,20 @@ const Login = () => {
         try {
             // --- DEMO BYPASS: MANAGER MODE ---
             if (email === 'demo@demo' && password === 'demo') {
-                 const userSession = {
+                const userSession = {
                     id: '00000000-0000-0000-0000-000000000000',
                     email: 'demo@demo',
                     name: 'Demo Manager',
                     role: role || 'gerente'
-                 };
-                 localStorage.setItem('chefia_user', JSON.stringify(userSession));
-                 navigate(role === 'cozinha' ? '/kitchen' : '/');
-                 return;
+                };
+                localStorage.setItem('chefia_user', JSON.stringify(userSession));
+                navigate(role === 'cozinha' ? '/kitchen' : '/');
+                return;
             }
 
             // 1. Real Login via Supabase Auth
             const { user } = await api.login(email, password);
-             
+
             if (user) {
                 const userSession = {
                     id: user.id,
@@ -88,7 +87,7 @@ const Login = () => {
                 </div>
 
                 <form onSubmit={handleLogin} style={{ display: 'grid', gap: '1rem' }}>
-                    
+
                     {error && (
                         <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.2)', color: '#fca5a5', borderRadius: '8px', fontSize: '0.9rem', textAlign: 'center' }}>
                             {error}

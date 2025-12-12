@@ -1,12 +1,12 @@
-import { HashRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
 import QRGenerator from './pages/QRGenerator';
 import TableDetail from './pages/TableDetail';
 import Team from './pages/Team';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
-
 import Kitchen from './pages/Kitchen';
 
 const RequireAuth = ({ children }) => {
@@ -36,6 +36,7 @@ const LayoutWrapper = ({ children }) => {
     { label: 'Cardápio', path: '/menu', icon: UtensilsCrossed },
     { label: 'Equipe', path: '/team', icon: Users }, // Staff Management
     { label: 'QR Code', path: '/qr', icon: QrCode },
+    { label: 'Configuração', path: '/settings', icon: SettingsIcon },
   ];
 
   const userRole = user.role || 'gerente';
@@ -136,6 +137,7 @@ function App() {
         <Route path="/menu" element={<RequireAuth><LayoutWrapper><MenuManager /></LayoutWrapper></RequireAuth>} />
         <Route path="/team" element={<RequireAuth><LayoutWrapper><Team /></LayoutWrapper></RequireAuth>} />
         <Route path="/qr" element={<RequireAuth><LayoutWrapper><QRGenerator /></LayoutWrapper></RequireAuth>} />
+        <Route path="/settings" element={<RequireAuth><LayoutWrapper><Settings /></LayoutWrapper></RequireAuth>} />
 
         {/* Catch all - Redirect to Home */}
         <Route path="*" element={<Navigate to="/" replace />} />

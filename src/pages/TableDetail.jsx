@@ -20,8 +20,8 @@ const TableDetail = () => {
         setLoading(false);
     };
 
-    // Filter only unpaid items for calculation
-    const pendingItems = table?.orders?.filter(o => o.status !== 'paid') || [];
+    // Filter only unpaid items for calculation, excluding Service Calls
+    const pendingItems = table?.orders?.filter(o => o.status !== 'paid' && o.name !== '🔔 CHAMAR GARÇOM') || [];
 
     // Calculate totals
     const subtotal = pendingItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
