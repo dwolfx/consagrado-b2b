@@ -71,7 +71,7 @@ const Team = () => {
                 </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem' }}>
+            <div className="dashboard-main-grid">
                 {/* Left Column: Staff Lists */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 

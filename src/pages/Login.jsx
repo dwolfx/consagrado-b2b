@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Crown, UtensilsCrossed, Wine, ClipboardList } from 'lucide-react';
 import { api } from '../services/api';
 
 const ROLES = [
-    { id: 'gerente', label: '👑 Gerente' },
-    { id: 'recepcao', label: '💃 Recepção / Hostess' },
-    { id: 'cozinha', label: '🍳 Cozinha' },
-    { id: 'bar', label: '🍸 Bar' }
+    { id: 'gerente', label: 'Gerente', icon: Crown },
+    { id: 'recepcao', label: 'Recepção', icon: ClipboardList },
+    { id: 'cozinha', label: 'Cozinha', icon: UtensilsCrossed },
+    { id: 'bar', label: 'Bar', icon: Wine }
 ];
 
 const Login = () => {
@@ -27,19 +27,6 @@ const Login = () => {
         setLoading(true);
 
         try {
-            // --- DEMO BYPASS: MANAGER MODE ---
-            if (email === 'demo@demo' && password === 'demo') {
-                const userSession = {
-                    id: '00000000-0000-0000-0000-000000000000',
-                    email: 'demo@demo',
-                    name: 'Demo Manager',
-                    role: role || 'gerente'
-                };
-                localStorage.setItem('chefia_user', JSON.stringify(userSession));
-                navigate(role === 'cozinha' ? '/kitchen' : '/');
-                return;
-            }
-
             // 1. Real Login via Supabase Auth
             const { user } = await api.login(email, password);
 
@@ -47,7 +34,7 @@ const Login = () => {
                 const userSession = {
                     id: user.id,
                     email: user.email,
-                    name: role === 'gerente' ? 'Gerente' : 'Staff',
+                    name: ROLES.find(r => r.id === role)?.label || 'Staff',
                     role: role
                 };
                 localStorage.setItem('chefia_user', JSON.stringify(userSession));
@@ -59,7 +46,7 @@ const Login = () => {
             }
         } catch (err) {
             console.error(err);
-            setError('Falha ao entrar.');
+            setError('Falha ao entrar. Verifique suas credenciais.');
         } finally {
             setLoading(false);
         }
@@ -83,7 +70,7 @@ const Login = () => {
                         <LayoutDashboard size={28} color="white" />
                     </div>
                     <h2>Chefia B2B</h2>
-                    <p style={{ color: '#94a3b8' }}>Acesse o painel do estabelecimento.</p>
+                    <p style={{ color: '#94a3b8' }}>Selecione seu cargo para entrar.</p>
                 </div>
 
                 <form onSubmit={handleLogin} style={{ display: 'grid', gap: '1rem' }}>
@@ -94,30 +81,47 @@ const Login = () => {
                         </div>
                     )}
 
-                    {/* MANAGER FORM */}
+                    {/* ROLE BUTTONS GRID */}
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: '#cbd5e1' }}>Perfil de Acesso</label>
-                        <select
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            style={{
-                                width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #475569',
-                                background: '#1e293b', color: 'white', cursor: 'pointer'
-                            }}
-                        >
+                        <label style={{ display: 'block', marginBottom: '0.75rem', fontSize: '0.875rem', color: '#cbd5e1' }}>Quem é você hoje?</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                             {ROLES.map(r => (
-                                <option key={r.id} value={r.id}>{r.label}</option>
+                                <button
+                                    key={r.id}
+                                    type="button"
+                                    onClick={() => setRole(r.id)}
+                                    style={{
+                                        padding: '0.75rem 0.25rem',
+                                        height: '80px',
+                                        borderRadius: '8px',
+                                        border: role === r.id ? '2px solid #3b82f6' : '1px solid #475569',
+                                        background: role === r.id ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.5)',
+                                        color: role === r.id ? 'white' : '#94a3b8',
+                                        cursor: 'pointer',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '500',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    <r.icon size={24} />
+                                    <span>{r.label}</span>
+                                </button>
                             ))}
-                        </select>
+                        </div>
                     </div>
 
-                    <div>
+                    <div style={{ marginTop: '0.5rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: '#cbd5e1' }}>Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@bar.com"
+                            placeholder="seu@email.com"
                             style={{
                                 width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #475569',
                                 background: '#1e293b', color: 'white'
@@ -141,7 +145,7 @@ const Login = () => {
                         marginTop: '1rem', width: '100%', padding: '0.75rem', background: loading ? '#475569' : '#3b82f6',
                         color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer'
                     }}>
-                        {loading ? 'Entrando...' : 'Entrar'}
+                        {loading ? 'Acessando...' : 'Entrar no Sistema'}
                     </button>
                 </form>
             </div>

@@ -69,7 +69,7 @@ const Dashboard = () => {
             </div>
 
             {/* KPI Cards */}
-            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="stats-grid" style={{ display: 'grid', gap: '1.5rem', marginBottom: '2rem' }}>
                 <div className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div>
@@ -95,7 +95,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '2rem' }}>
+            <div className="dashboard-main-grid">
                 {/* Live Table Map */}
                 <div>
                     <h2 style={{ marginBottom: '1.5rem' }}>Mapa de Mesas</h2>

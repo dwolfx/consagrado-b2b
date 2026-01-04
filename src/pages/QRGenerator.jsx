@@ -11,7 +11,7 @@ const QRGenerator = () => {
                 </button>
             </div>
 
-            <div className="grid-tables" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+            <div className="grid-tables">
                 {tables.map(table => (
                     <div key={table.id} className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '2rem' }}>
                         <h3 style={{ marginBottom: '1rem' }}>Mesa {table.number}</h3>

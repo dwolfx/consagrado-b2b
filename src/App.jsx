@@ -1,5 +1,8 @@
+
+
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
 import QRGenerator from './pages/QRGenerator';
@@ -8,6 +11,9 @@ import Team from './pages/Team';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Kitchen from './pages/Kitchen';
+import Sales from './pages/Sales';
+import Suppliers from './pages/Suppliers';
+
 
 const RequireAuth = ({ children }) => {
   const user = localStorage.getItem('chefia_user');
@@ -32,9 +38,11 @@ const LayoutWrapper = ({ children }) => {
 
   const navItems = [
     { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
+    { label: 'Saída de Caixa', path: '/sales', icon: QrCode },
     { label: 'Cozinha (KDS)', path: '/kitchen', icon: UtensilsCrossed },
     { label: 'Cardápio', path: '/menu', icon: UtensilsCrossed },
-    { label: 'Equipe', path: '/team', icon: Users }, // Staff Management
+    { label: 'Fornecedores', path: '/suppliers', icon: Users },
+    { label: 'Equipe', path: '/team', icon: Users },
     { label: 'QR Code', path: '/qr', icon: QrCode },
     { label: 'Configuração', path: '/settings', icon: SettingsIcon },
   ];
@@ -57,12 +65,49 @@ const LayoutWrapper = ({ children }) => {
     return allowedPaths.includes(item.path);
   });
 
+  /* Sidebar Logic */
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+
   return (
     <div className="dashboard-layout">
+      {/* Mobile Header (Only visible < 768px via CSS) */}
+      <div className="mobile-header" style={{
+        padding: '1rem',
+        borderBottom: '1px solid var(--bg-tertiary)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        backgroundColor: 'var(--bg-secondary)',
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 998
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+            <Menu size={24} />
+          </button>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary)', margin: 0 }}>Chefia</h1>
+        </div>
+        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {user.name?.charAt(0) || 'A'}
+        </div>
+      </div>
+
+      {/* Sidebar Overlay (Mobile Only) */}
+      {isSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div style={{ padding: '2rem', borderBottom: '1px solid var(--bg-tertiary)' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>Chefia</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            Chefia
+            {/* Close Button Mobile */}
+            <button className="mobile-only-btn" onClick={() => setSidebarOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+              <X size={24} />
+            </button>
+          </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
             {userRole === 'gerente' ? 'Gestão Completa' :
               userRole === 'recepcao' ? 'Recepção' :
@@ -75,6 +120,7 @@ const LayoutWrapper = ({ children }) => {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={() => setSidebarOpen(false)} // Auto close on click mobile
               style={({ isActive }) => ({
                 display: 'flex', alignItems: 'center', gap: '0.75rem',
                 padding: '0.75rem 1rem', marginBottom: '0.5rem', borderRadius: '0.5rem',
@@ -134,6 +180,8 @@ function App() {
         <Route path="/" element={<RequireAuth><LayoutWrapper><Dashboard /></LayoutWrapper></RequireAuth>} />
         <Route path="/kitchen" element={<RequireAuth><LayoutWrapper><Kitchen /></LayoutWrapper></RequireAuth>} />
         <Route path="/table/:id" element={<RequireAuth><LayoutWrapper><TableDetail /></LayoutWrapper></RequireAuth>} />
+        <Route path="/sales" element={<RequireAuth><LayoutWrapper><Sales /></LayoutWrapper></RequireAuth>} />
+        <Route path="/suppliers" element={<RequireAuth><LayoutWrapper><Suppliers /></LayoutWrapper></RequireAuth>} />
         <Route path="/menu" element={<RequireAuth><LayoutWrapper><MenuManager /></LayoutWrapper></RequireAuth>} />
         <Route path="/team" element={<RequireAuth><LayoutWrapper><Team /></LayoutWrapper></RequireAuth>} />
         <Route path="/qr" element={<RequireAuth><LayoutWrapper><QRGenerator /></LayoutWrapper></RequireAuth>} />
