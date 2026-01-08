@@ -5,7 +5,7 @@ import { Save, Store, Palette, Loader2 } from 'lucide-react';
 const Settings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [estab, setEstab] = useState({ name: '', theme_color: '#6366f1', theme_secondary_color: '#f59e0b', theme_background_color: '#09090b' });
+    const [estab, setEstab] = useState({ name: '', theme_color: '#6366f1', theme_secondary_color: '#f59e0b', theme_background_color: '#09090b', settings: {} });
 
     useEffect(() => {
         loadEstab();
@@ -38,7 +38,10 @@ const Settings = () => {
                     name: estab.name,
                     theme_color: estab.theme_color,
                     theme_secondary_color: estab.theme_secondary_color,
-                    theme_background_color: estab.theme_background_color
+                    theme_background_color: estab.theme_background_color,
+                    settings: {
+                        ...estab.settings
+                    }
                 })
                 .eq('id', estab.id);
 
@@ -201,7 +204,12 @@ const Settings = () => {
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>
                             Define a cor de fundo do app. Um degradê sutil será gerado automaticamente.
                         </p>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>
+                            Define a cor de fundo do app. Um degradê sutil será gerado automaticamente.
+                        </p>
                     </div>
+
+
 
                     <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '2rem', marginTop: '1rem' }}>
                         <button
@@ -223,5 +231,4 @@ const Settings = () => {
         </div>
     );
 };
-
 export default Settings;
