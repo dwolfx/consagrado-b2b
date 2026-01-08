@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Plus, Edit, Trash, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, X, Save, ArrowLeft, ArrowRight, List, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, X, Save, ArrowLeft, ArrowRight, List, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '../services/api'; // Add supabase import
 
 const MenuManager = () => {
@@ -9,6 +9,10 @@ const MenuManager = () => {
     const [categoryOrder, setCategoryOrder] = useState([]);
     const [hiddenCategories, setHiddenCategories] = useState([]);
     const [loadingOrder, setLoadingOrder] = useState(false);
+
+    // Inline Editing State
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [editValue, setEditValue] = useState('');
     const [savingOrder, setSavingOrder] = useState(false);
 
     // Import State
@@ -119,11 +123,25 @@ const MenuManager = () => {
         setCategoryOrder(newOrder);
     };
 
-    const handleRenameCategory = async (oldName) => {
-        const newName = prompt(`Renomear categoria "${oldName}" para:`, oldName);
-        if (!newName || newName === oldName) return;
+    const startEditing = (cat) => {
+        setEditingCategory(cat);
+        setEditValue(cat);
+    };
 
-        if (categoryOrder.includes(newName)) {
+    const cancelEditing = () => {
+        setEditingCategory(null);
+        setEditValue('');
+    };
+
+    const saveRename = async (oldName) => {
+        const newName = editValue.trim();
+
+        if (!newName || newName === oldName) {
+            cancelEditing();
+            return;
+        }
+
+        if (categoryOrder.includes(newName) || hiddenCategories.includes(newName)) {
             alert('Já existe uma categoria com este nome.');
             return;
         }
@@ -526,57 +544,99 @@ const MenuManager = () => {
                                     ) : (
                                         categoryOrder.map((cat, index) => (
                                             <div key={cat} style={{
-                                                display: 'flex', alignItems: 'center',
-                                                background: 'var(--bg-primary)',
+                                                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                                                background: 'var(--bg-tertiary)',
                                                 border: '1px solid var(--glass-border)',
                                                 borderRadius: '50px',
-                                                padding: '0.25rem 0.5rem',
-                                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                                transition: 'all 0.2s'
+                                                padding: '0.5rem 1rem',
+                                                // No box shadow or extra borders for cleaner look
                                             }}>
-                                                <button
-                                                    onClick={() => moveCategory(index, 'left')}
-                                                    disabled={index === 0}
-                                                    className="btn-ghost"
-                                                    style={{
-                                                        padding: '6px', borderRadius: '50%',
-                                                        color: index === 0 ? 'var(--text-tertiary)' : 'var(--primary)',
-                                                        cursor: index === 0 ? 'default' : 'pointer'
-                                                    }}
-                                                    title="Mover para esquerda"
-                                                >
-                                                    <ArrowLeft size={16} />
-                                                </button>
+                                                {/* Edit Name */}
+                                                {/* Edit Name / Input */}
+                                                {editingCategory === cat ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        onBlur={() => saveRename(cat)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') saveRename(cat);
+                                                            if (e.key === 'Escape') cancelEditing();
+                                                        }}
+                                                        autoFocus
+                                                        style={{
+                                                            border: 'none',
+                                                            background: 'transparent',
+                                                            color: 'white',
+                                                            fontWeight: 600,
+                                                            fontSize: '0.95rem',
+                                                            outline: 'none',
+                                                            width: `${Math.max(editValue.length, 5)}ch`,
+                                                            padding: '0 0.5rem',
+                                                            textAlign: 'center'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        onClick={() => startEditing(cat)}
+                                                        style={{
+                                                            fontWeight: 500, color: 'var(--text-secondary)',
+                                                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                                                            userSelect: 'none',
+                                                            padding: '0 0.5rem'
+                                                        }}
+                                                        title="Clique para renomear"
+                                                    >
+                                                        {cat}
+                                                        <Edit size={12} style={{ opacity: 0.3 }} />
+                                                    </div>
+                                                )}
 
-                                                <div
-                                                    onClick={() => handleRenameCategory(cat)}
-                                                    style={{
-                                                        padding: '0.5rem 1rem',
-                                                        fontWeight: 600,
-                                                        color: 'white',
-                                                        cursor: 'pointer',
-                                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                                        userSelect: 'none'
-                                                    }}
-                                                    title="Clique para renomear"
-                                                >
-                                                    {cat}
-                                                    <Edit size={12} style={{ opacity: 0.5 }} />
+                                                {/* Controls Container - No Border */}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', paddingLeft: '0.75rem' }}>
+                                                    {/* Move Left */}
+                                                    <button
+                                                        onClick={() => moveCategory(index, 'left')}
+                                                        disabled={index === 0}
+                                                        style={{
+                                                            padding: '4px', borderRadius: '50%',
+                                                            background: 'none', border: 'none', cursor: 'pointer',
+                                                            color: index === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                                                            opacity: index === 0 ? 0.3 : 1
+                                                        }}
+                                                        title="Mover para esquerda"
+                                                    >
+                                                        <ArrowLeft size={16} />
+                                                    </button>
+
+                                                    {/* Hide */}
+                                                    <button
+                                                        onClick={() => toggleHideCategory(cat)}
+                                                        style={{
+                                                            padding: '4px', borderRadius: '50%',
+                                                            background: 'none', border: 'none', cursor: 'pointer',
+                                                            color: 'var(--text-secondary)'
+                                                        }}
+                                                        title="Ocultar"
+                                                    >
+                                                        <EyeOff size={16} />
+                                                    </button>
+
+                                                    {/* Move Right */}
+                                                    <button
+                                                        onClick={() => moveCategory(index, 'right')}
+                                                        disabled={index === categoryOrder.length - 1}
+                                                        style={{
+                                                            padding: '4px', borderRadius: '50%',
+                                                            background: 'none', border: 'none', cursor: 'pointer',
+                                                            color: index === categoryOrder.length - 1 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                                                            opacity: index === categoryOrder.length - 1 ? 0.3 : 1
+                                                        }}
+                                                        title="Mover para direita"
+                                                    >
+                                                        <ArrowRight size={16} />
+                                                    </button>
                                                 </div>
-
-                                                <button
-                                                    onClick={() => moveCategory(index, 'right')}
-                                                    disabled={index === categoryOrder.length - 1}
-                                                    className="btn-ghost"
-                                                    style={{
-                                                        padding: '6px', borderRadius: '50%',
-                                                        color: index === categoryOrder.length - 1 ? 'var(--text-tertiary)' : 'var(--primary)',
-                                                        cursor: index === categoryOrder.length - 1 ? 'default' : 'pointer'
-                                                    }}
-                                                    title="Mover para direita"
-                                                >
-                                                    <ArrowRight size={16} />
-                                                </button>
                                             </div>
                                         ))
                                     )}
