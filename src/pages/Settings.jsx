@@ -5,7 +5,7 @@ import { Save, Store, Palette, Loader2 } from 'lucide-react';
 const Settings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [estab, setEstab] = useState({ name: '', theme_color: '#6366f1' });
+    const [estab, setEstab] = useState({ name: '', theme_color: '#6366f1', theme_secondary_color: '#f59e0b', theme_background_color: '#09090b' });
 
     useEffect(() => {
         loadEstab();
@@ -36,7 +36,9 @@ const Settings = () => {
                 .from('establishments')
                 .update({
                     name: estab.name,
-                    theme_color: estab.theme_color
+                    theme_color: estab.theme_color,
+                    theme_secondary_color: estab.theme_secondary_color,
+                    theme_background_color: estab.theme_background_color
                 })
                 .eq('id', estab.id);
 
@@ -120,6 +122,84 @@ const Settings = () => {
                         </div>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>
                             Essa cor será usada no App do Cliente e nos botões principais.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Cor Secundária (Destaque)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{
+                                flex: 1, display: 'flex', alignItems: 'center', gap: '1rem',
+                                background: 'var(--bg-primary)', padding: '0.875rem 1rem',
+                                border: '1px solid var(--glass-border)', borderRadius: '12px'
+                            }}>
+                                <Palette size={20} color={estab.theme_secondary_color} />
+                                <input
+                                    type="text"
+                                    value={estab.theme_secondary_color}
+                                    onChange={e => setEstab({ ...estab, theme_secondary_color: e.target.value })}
+                                    pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                                    placeholder="#000000"
+                                    required
+                                    style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', color: 'white', fontSize: '1rem' }}
+                                />
+                            </div>
+                            <div style={{
+                                width: '56px', height: '56px', borderRadius: '12px',
+                                background: estab.theme_secondary_color,
+                                border: '2px solid var(--glass-border)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                overflow: 'hidden'
+                            }}>
+                                <input
+                                    type="color"
+                                    value={estab.theme_secondary_color}
+                                    onChange={e => setEstab({ ...estab, theme_secondary_color: e.target.value })}
+                                    style={{ width: '150%', height: '150%', border: 'none', cursor: 'pointer', opacity: 0 }}
+                                />
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>
+                            Usada para detalhes, bordas e elementos de menor destaque.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Cor de Fundo (Background)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{
+                                flex: 1, display: 'flex', alignItems: 'center', gap: '1rem',
+                                background: 'var(--bg-primary)', padding: '0.875rem 1rem',
+                                border: '1px solid var(--glass-border)', borderRadius: '12px'
+                            }}>
+                                <Palette size={20} color={estab.theme_background_color} />
+                                <input
+                                    type="text"
+                                    value={estab.theme_background_color}
+                                    onChange={e => setEstab({ ...estab, theme_background_color: e.target.value })}
+                                    pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                                    placeholder="#000000"
+                                    required
+                                    style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', color: 'white', fontSize: '1rem' }}
+                                />
+                            </div>
+                            <div style={{
+                                width: '56px', height: '56px', borderRadius: '12px',
+                                background: estab.theme_background_color,
+                                border: '2px solid var(--glass-border)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                overflow: 'hidden'
+                            }}>
+                                <input
+                                    type="color"
+                                    value={estab.theme_background_color}
+                                    onChange={e => setEstab({ ...estab, theme_background_color: e.target.value })}
+                                    style={{ width: '150%', height: '150%', border: 'none', cursor: 'pointer', opacity: 0 }}
+                                />
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>
+                            Define a cor de fundo do app. Um degradê sutil será gerado automaticamente.
                         </p>
                     </div>
 

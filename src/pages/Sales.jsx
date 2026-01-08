@@ -10,20 +10,28 @@ const Sales = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Mocking sales data for the "Saída de Caixa" view
-        // Ideally we would add api.getSales()
-        const mockSales = [
-            { id: 1, table: 'Mesa 01', total: 125.50, payment_method: 'PIX', date: '2024-03-20 19:30', items: ['Heineken (2)', 'Batata Frita'] },
-            { id: 2, table: 'Mesa 05', total: 64.00, payment_method: 'Cartão', date: '2024-03-20 20:15', items: ['Gin Tônica (2)'] },
-            { id: 3, table: 'Balcão', total: 18.00, payment_method: 'Dinheiro', date: '2024-03-20 21:00', items: ['Heineken'] },
-            { id: 4, table: 'Mesa 03', total: 250.00, payment_method: 'PIX', date: '2024-03-20 21:45', items: ['Combo Vodka', 'Energético (4)'] },
-        ];
-
-        setTimeout(() => {
-            setSales(mockSales);
-            setLoading(false);
-        }, 1000);
+        loadSales();
     }, []);
+
+    const loadSales = async () => {
+        try {
+            const data = await api.getSales();
+            // Data mapping to match UI
+            const formattedSales = data.map(item => ({
+                id: item.id,
+                table: item.table_id ? `Mesa ${item.table_id}` : 'Balcão',
+                total: item.amount,
+                payment_method: item.method || 'Outro',
+                date: new Date(item.created_at).toLocaleString('pt-BR'),
+                items: [] // In this simple MVP, payment is total amount, separate from order items. Ideally we'd join table orders.
+            }));
+            setSales(formattedSales);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const totalRevenue = sales.reduce((acc, curr) => acc + curr.total, 0);
 
@@ -76,7 +84,7 @@ const Sales = () => {
                             <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
                                 <th style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase' }}>Hora</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mesa/Origem</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase' }}>Itens</th>
+                                {/* <th style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase' }}>Itens</th> */}
                                 <th style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase' }}>Pagamento</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-secondary)', textAlign: 'right', fontSize: '0.85rem', textTransform: 'uppercase' }}>Total</th>
                             </tr>
@@ -88,12 +96,12 @@ const Sales = () => {
                                 sales.map(sale => (
                                     <tr key={sale.id} style={{ borderBottom: '1px solid var(--glass-border)', transition: 'background 0.2s' }}>
                                         <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
-                                            {sale.date.split(' ')[1]}
+                                            {sale.date.split(',')[1]}
                                         </td>
                                         <td style={{ padding: '1rem', fontWeight: 500 }}>{sale.table}</td>
-                                        <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                                        {/* <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                                             {sale.items.join(', ')}
-                                        </td>
+                                        </td> */}
                                         <td style={{ padding: '1rem' }}>
                                             <span style={{
                                                 padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600',

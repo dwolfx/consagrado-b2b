@@ -1,7 +1,7 @@
 
 
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X, Banknote } from 'lucide-react';
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
@@ -38,7 +38,7 @@ const LayoutWrapper = ({ children }) => {
 
   const navItems = [
     { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
-    { label: 'Saída de Caixa', path: '/sales', icon: QrCode },
+    { label: 'Vendas (Caixa)', path: '/sales', icon: Banknote },
     { label: 'Cozinha (KDS)', path: '/kitchen', icon: UtensilsCrossed },
     { label: 'Cardápio', path: '/menu', icon: UtensilsCrossed },
     { label: 'Fornecedores', path: '/suppliers', icon: Users },

@@ -9,18 +9,19 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export const api = {
     // Products
     // Products
-    getProducts: async () => {
+    getProducts: async (establishmentId = 1) => {
         let { data, error } = await supabase
             .from('products')
             .select('*')
+            .eq('establishment_id', establishmentId)
             .order('name');
         if (error) console.error('Error fetching products', error);
         return data || [];
     },
-    createProduct: async (product) => {
+    createProduct: async (product, establishmentId = 1) => {
         const { data, error } = await supabase
             .from('products')
-            .insert([product])
+            .insert([{ ...product, establishment_id: establishmentId }])
             .select();
         if (error) throw error;
         return data[0];
@@ -44,10 +45,11 @@ export const api = {
     },
 
     // Tables
-    getTables: async () => {
+    getTables: async (establishmentId = 1) => {
         let { data, error } = await supabase
             .from('tables')
             .select('*, orders(*), establishment:establishments(*)')
+            .eq('establishment_id', establishmentId)
             .order('number');
         if (error) console.error('Error fetching tables', error);
         return data || [];
@@ -67,13 +69,15 @@ export const api = {
         const { data, error } = await supabase
             .from('orders')
             .insert([{
+                establishment_id: 1, // Default to Pizzaria for Demo
                 table_id: tableId,
                 product_id: orderItem.productId,
                 name: orderItem.name,
                 price: orderItem.price,
                 quantity: orderItem.quantity,
                 status: 'pending',
-                ordered_by: orderItem.orderedBy
+                author_name: orderItem.orderedBy, // Compatibility with V2
+                // ordered_by_staff_id: ... (Future: Link real ID)
             }])
             .select();
 
@@ -121,13 +125,62 @@ export const api = {
         return data || [];
     },
 
-    // Users (Auth)
+    // Users (Auth) - B2B Custom Auth for Schema V2
     login: async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+        // 1. Try finding in b2b_users
+        const { data, error } = await supabase
+            .from('b2b_users')
+            .select('*')
+            .eq('email', email)
+            .eq('password_hash', password) // Simulação Demo
+            .single();
+
+        if (error || !data) throw new Error('Credenciais inválidas');
+        return { user: data, session: { access_token: 'demo-token' } };
+    },
+
+    // Sales / Payments
+    getSales: async (establishmentId = 1) => {
+        // Fetch from 'payments' table
+        const { data, error } = await supabase
+            .from('payments')
+            .select('*, establishment:establishments(name)')
+            .eq('establishment_id', establishmentId)
+            .order('created_at', { ascending: false });
+
+        if (error) console.error('Error fetching sales', error);
+        return data || [];
+    },
+
+    // Suppliers
+    getSuppliers: async (establishmentId = 1) => {
+        const { data, error } = await supabase
+            .from('suppliers')
+            .select('*')
+            .eq('establishment_id', establishmentId)
+            .order('name');
+
+        if (error) console.error('Error fetching suppliers', error);
+        return data || [];
+    },
+
+    addSupplier: async (supplier, establishmentId = 1) => {
+        const { data, error } = await supabase
+            .from('suppliers')
+            .insert([{ ...supplier, establishment_id: establishmentId }])
+            .select();
+
         if (error) throw error;
-        return data;
+        return data[0];
+    },
+
+    deleteSupplier: async (id) => {
+        const { error } = await supabase
+            .from('suppliers')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
     }
 };
