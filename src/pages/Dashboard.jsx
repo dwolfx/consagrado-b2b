@@ -24,14 +24,19 @@ const Dashboard = () => {
     useEffect(() => {
         // Initial Load
         const load = async () => {
-            const data = await api.getTables();
+            let userEstabId = 1;
+            try {
+                const user = JSON.parse(localStorage.getItem('chefia_user') || '{}');
+                if (user.establishment_id) userEstabId = user.establishment_id;
+            } catch (e) {}
+
+            const data = await api.getTables(userEstabId);
             setTables(data);
 
             const { data: staffData } = await supabase
                 .from('users')
                 .select('*')
-                .eq('role', 'waiter')
-                .eq('is_working_now', true);
+                .eq('role', 'waiter');
             setStaff(staffData || []);
         };
         load();

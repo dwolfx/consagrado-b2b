@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LayoutDashboard, Crown, UtensilsCrossed, Wine, ClipboardList } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -148,6 +148,11 @@ const Login = () => {
                         {loading ? 'Acessando...' : 'Entrar no Sistema'}
                     </button>
                 </form>
+
+                <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: '#94a3b8' }}>
+                    Não possui um estabelecimento cadastrado? <br />
+                    <Link to="/register" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: '500', display: 'inline-block', marginTop: '0.5rem' }}>Crie sua conta aqui ▸</Link>
+                </div>
             </div>
         </div>
     );

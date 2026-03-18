@@ -63,6 +63,19 @@ export const api = {
         if (error) console.error('Error fetching table', error);
         return data;
     },
+    addTable: async (number, code, establishmentId) => {
+        const { data, error } = await supabase
+            .from('tables')
+            .insert([{ number, code, establishment_id: establishmentId, status: 'free' }])
+            .select();
+        if (error) throw error;
+        return data[0];
+    },
+    deleteTable: async (id) => {
+        const { error } = await supabase.from('tables').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+    },
     // Orders
     addOrder: async (tableId, orderItem) => {
         // Just insert into orders table. Realtime triggers will handle the rest.
@@ -139,6 +152,39 @@ export const api = {
         return { user: data, session: { access_token: 'demo-token' } };
     },
 
+    register: async (email, password, establishmentName) => {
+        // 1. Criar novo Usuário primeiro (b2b_users não tem establishment_id, tem apenas id, name, email, password_hash)
+        const { data: userData, error: userError } = await supabase
+            .from('b2b_users')
+            .insert([{
+                name: 'Gerente Principal',
+                email: email,
+                password_hash: password // Demo only
+            }])
+            .select()
+            .single();
+
+        if (userError) throw new Error('Erro ao criar usuário, email já existente ou inválido.');
+
+        // 2. Criar Estabelecimento com owner_id referenciando o usuário
+        const { data: estabData, error: estabError } = await supabase
+            .from('establishments')
+            .insert([{ name: establishmentName, owner_id: userData.id }])
+            .select()
+            .single();
+            
+        if (estabError) {
+            console.error(estabError);
+            throw new Error('Erro ao criar estabelecimento.');
+        }
+        
+        // Atribui establishment_id no objeto para facilitar a sessão no app
+        userData.establishment_id = estabData.id;
+        userData.role = 'gerente';
+        
+        return { user: userData, session: { access_token: 'demo-token' } };
+    },
+
     // Sales / Payments
     getSales: async (establishmentId = 1) => {
         // Fetch from 'payments' table
@@ -180,6 +226,40 @@ export const api = {
             .delete()
             .eq('id', id);
 
+        if (error) throw error;
+        return true;
+    },
+
+    // Inventory
+    getInventory: async (establishmentId) => {
+        let query = supabase.from('inventory').select('*, suppliers(*)');
+        if (establishmentId) query = query.eq('establishment_id', establishmentId);
+        let { data, error } = await query;
+        if (error) console.error(error);
+        return data || [];
+    },
+    createInventoryItem: async (itemData) => {
+        const { data, error } = await supabase
+            .from('inventory')
+            .insert([itemData])
+            .select();
+        if (error) throw error;
+        return data[0];
+    },
+    updateInventoryItem: async (id, updates) => {
+        const { data, error } = await supabase
+            .from('inventory')
+            .update(updates)
+            .eq('id', id)
+            .select();
+        if (error) throw error;
+        return data;
+    },
+    deleteInventoryItem: async (id) => {
+        const { error } = await supabase
+            .from('inventory')
+            .delete()
+            .eq('id', id);
         if (error) throw error;
         return true;
     }

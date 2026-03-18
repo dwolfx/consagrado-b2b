@@ -1,7 +1,7 @@
 
 
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X, Banknote } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X, Banknote, Package } from 'lucide-react';
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
@@ -10,9 +10,11 @@ import TableDetail from './pages/TableDetail';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Kitchen from './pages/Kitchen';
 import Sales from './pages/Sales';
 import Suppliers from './pages/Suppliers';
+import Inventory from './pages/Inventory';
 
 
 const RequireAuth = ({ children }) => {
@@ -41,6 +43,7 @@ const LayoutWrapper = ({ children }) => {
     { label: 'Cozinha (KDS)', path: '/kitchen', icon: UtensilsCrossed },
     { label: 'Cardápio', path: '/menu', icon: UtensilsCrossed },
     { label: 'Fornecedores', path: '/suppliers', icon: Users },
+    { label: 'Estoque', path: '/inventory', icon: Package },
     { label: 'Equipe', path: '/team', icon: Users },
     { label: 'QR Code', path: '/qr', icon: QrCode },
     { label: 'Configuração', path: '/settings', icon: SettingsIcon },
@@ -175,12 +178,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         <Route path="/" element={<RequireAuth><LayoutWrapper><Dashboard /></LayoutWrapper></RequireAuth>} />
         <Route path="/kitchen" element={<RequireAuth><LayoutWrapper><Kitchen /></LayoutWrapper></RequireAuth>} />
         <Route path="/table/:id" element={<RequireAuth><LayoutWrapper><TableDetail /></LayoutWrapper></RequireAuth>} />
         <Route path="/sales" element={<RequireAuth><LayoutWrapper><Sales /></LayoutWrapper></RequireAuth>} />
         <Route path="/suppliers" element={<RequireAuth><LayoutWrapper><Suppliers /></LayoutWrapper></RequireAuth>} />
+        <Route path="/inventory" element={<RequireAuth><LayoutWrapper><Inventory /></LayoutWrapper></RequireAuth>} />
         <Route path="/menu" element={<RequireAuth><LayoutWrapper><MenuManager /></LayoutWrapper></RequireAuth>} />
         <Route path="/team" element={<RequireAuth><LayoutWrapper><Team /></LayoutWrapper></RequireAuth>} />
         <Route path="/qr" element={<RequireAuth><LayoutWrapper><QRGenerator /></LayoutWrapper></RequireAuth>} />
