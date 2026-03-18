@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api, supabase } from '../services/api'; // Ensure supabase is exported or use api method
+import { supabase } from '../services/api';
 import { Save, Store, Palette, Loader2 } from 'lucide-react';
 
 const Settings = () => {
@@ -16,7 +16,7 @@ const Settings = () => {
         // In real multi-tenant, we'd get this from the user's profile or context.
         // For this MVP/Demo, we explicitly target Establishment ID 1
         // This ensures that when the "Demo Manager" edits settings, they are editing the "Demo Establishment"
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('establishments')
             .select('*')
             .eq('id', 1) // Force ID 1 for the Demo

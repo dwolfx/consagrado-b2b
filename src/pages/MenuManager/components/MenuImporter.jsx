@@ -3,7 +3,6 @@ import { FileSpreadsheet, Upload, Download } from 'lucide-react';
 
 const MenuImporter = ({ onDownloadTemplate }) => {
     const [dragActive, setDragActive] = useState(false);
-    const [uploadStatus, setUploadStatus] = useState('idle');
 
     const handleDrag = (e) => {
         e.preventDefault();
@@ -24,11 +23,9 @@ const MenuImporter = ({ onDownloadTemplate }) => {
         }
     };
 
-    const handleFile = (file) => {
-        setUploadStatus('uploading');
+    const handleFile = () => {
         // Mock upload simulation
         setTimeout(() => {
-            setUploadStatus('success');
             // Here we would actually parse the CSV and call an onImport function
             alert('Funcionalidade de processamento de CSV simulada.');
         }, 1500);

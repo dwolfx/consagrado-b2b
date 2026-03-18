@@ -11,14 +11,13 @@ const TableDetail = () => {
     const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
+        const loadTable = async () => {
+            const data = await api.getTable(id);
+            setTable(data);
+            setLoading(false);
+        };
         loadTable();
     }, [id]);
-
-    const loadTable = async () => {
-        const data = await api.getTable(id);
-        setTable(data);
-        setLoading(false);
-    };
 
     // Filter only unpaid items for calculation, excluding Service Calls
     const pendingItems = table?.orders?.filter(o => o.status !== 'paid' && o.name !== '🔔 CHAMAR GARÇOM') || [];

@@ -62,7 +62,8 @@ const Suppliers = () => {
         try {
             await api.deleteSupplier(id);
             setSuppliers(suppliers.filter(s => s.id !== id));
-        } catch (error) {
+        } catch (err) {
+            console.error(err);
             alert('Erro ao remover fornecedor');
         }
     };

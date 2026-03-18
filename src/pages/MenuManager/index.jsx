@@ -31,6 +31,7 @@ const MenuManager = () => {
         if (activeTab === 'order') {
             loadCategoryOrder();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
     // --- LOAD DATA ---

@@ -1,6 +1,6 @@
 
 
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UtensilsCrossed, QrCode, LogOut, Users, Settings as SettingsIcon, Menu, X, Banknote } from 'lucide-react';
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
@@ -23,7 +23,6 @@ const RequireAuth = ({ children }) => {
 
 const LayoutWrapper = ({ children }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   let user = {};
   try {
     user = JSON.parse(localStorage.getItem('chefia_user') || '{}');

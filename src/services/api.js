@@ -119,7 +119,7 @@ export const api = {
 
     // Establishments
     getEstablishments: async () => {
-        let { data, error } = await supabase
+        let { data } = await supabase
             .from('establishments')
             .select('*');
         return data || [];

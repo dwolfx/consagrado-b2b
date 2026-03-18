@@ -17,6 +17,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSubmit }) => {
     useEffect(() => {
         if (isOpen) {
             if (product) {
+                // eslint-disable-next-line
                 setFormData({
                     name: product.name,
                     category: product.category,
